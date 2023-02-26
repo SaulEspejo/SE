@@ -1,11 +1,28 @@
-def inferir(knowledge_base, condiciones):
-  for regla in knowledge_base:
-    premisa, conclusion = regla.split("entonces")
-    premisa = premisa.strip()
-    conclusion = conclusion.strip()
+import numpy as np
+import skfuzzy as fuzz
 
-    premisas_cumplidas = all([condicion in condiciones for condicion in premisa.split("y")])
-    if premisas_cumplidas:
-      return conclusion
+def inferir(knowledge_base, entrada):
+  variables_entrada = {}
+  for nombre_variable, valor in entrada.items():
+    terminos = {}
+    for nombre_termino, parametros in knowledge_base[nombre_variable][1].items():
+      tipo, valores = parametros
+      if tipo == 'trapezoidal':
+        terminos[nombre_termino] = fuzz.trapmf(np.array([valor]), np.array(valores))
+      elif tipo == 'gaussiano':
+        terminos[nombre_termino] = fuzz.gaussmf(np.array([valor]), valores[0], valores[1])
+      elif tipo == 'sigmoide':
+        terminos[nombre_termino] = fuzz.sigmf(np.array([valor]), valores[0], valores[1])
 
-  return None
+    variables_entrada[nombre_variable] = terminos
+
+  variables_salida = {}
+  for nombre_variable_salida, atributos_salida in knowledge_base['salidas'].items():
+    variables_salida[nombre_variable_salida] = np.zeros_like(atributos_salida)
+    for nombre_termino, valor_termino in variables_entrada.items():
+      pesos = np.fmin(valor_termino, atributos_salida[nombre_termino])
+      variables_salida[nombre_variable_salida] = np.fmax(variables_salida[nombre_variable_salida], pesos)
+
+  salida = {}
+  for nombre_variable_salida, atributos_salida in knowledge_base['salidas'].items():
+    salida[nombre_variable_salida] = fuzz.defuzzify.defuzz

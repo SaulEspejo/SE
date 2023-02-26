@@ -1,0 +1,13 @@
+def interfaz_usuario():
+  condiciones = []
+  temperatura = input("¿Cuál es la temperatura actual? ")
+  condiciones.append("hace más de 30 grados" if int(temperatura) > 30 else "no hace más de 30 grados")
+  tiempo = input("¿Cómo está el clima? ")
+  condiciones.append("hace sol" if tiempo == "soleado" else "hace mal tiempo")
+
+  decision = inferir(knowledge_base, condiciones)
+
+  if decision:
+    print("Decisión: " + decision)
+  else:
+    print("No se pudo tomar una decisión.")

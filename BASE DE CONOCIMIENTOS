@@ -1,2 +1,25 @@
-knowledge_base = [  ("si es sábado o domingo y hace sol, entonces vamos a la playa"),  
-("si hace mal tiempo, entonces no vamos a la playa"),  ("si hace más de 30 grados, entonces vamos a la playa"),  ("si no vamos a la playa, entonces vamos al cine"),]
+
+import xml.etree.ElementTree as ET
+
+def cargar_base_conocimientos():
+  arbol = ET.parse('base_conocimientos.xml')
+  raiz = arbol.getroot()
+
+  base_conocimientos = {}
+
+  for concepto in raiz.findall('concepto'):
+    nombre = concepto.get('nombre')
+    descripcion = concepto.find('descripcion').text
+
+    atributos = {}
+    for atributo in concepto.findall('atributo'):
+      nombre_atributo = atributo.get('nombre')
+      tipo_atributo = atributo.get('tipo')
+      valores_atributo = []
+      for valor in atributo.findall('valor'):
+        valores_atributo.append(valor.text)
+      atributos[nombre_atributo] = (tipo_atributo, valores_atributo)
+
+    base_conocimientos[nombre] = (descripcion, atributos)
+
+  return base_conocimientos

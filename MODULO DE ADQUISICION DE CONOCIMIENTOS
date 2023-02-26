@@ -1,0 +1,3 @@
+def agregar_regla(knowledge_base):
+  nueva_regla = input("Ingrese una nueva regla: ")
+  knowledge_base.append(nueva_regla)

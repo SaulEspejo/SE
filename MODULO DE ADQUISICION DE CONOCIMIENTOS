@@ -1,3 +1,37 @@
-def agregar_regla(knowledge_base):
-  nueva_regla = input("Ingrese una nueva regla: ")
-  knowledge_base.append(nueva_regla)
+class KnowledgeAcquisitionModule:
+    def __init__(self, expert_system):
+        self.expert_system = expert_system
+
+    def acquire_knowledge(self):
+        # Obtener información del usuario para agregar nueva regla al sistema experto
+        premise_1 = input("Ingrese la primera premisa: ")
+        premise_2 = input("Ingrese la segunda premisa (dejar en blanco si no hay otra premisa): ")
+        conclusion = input("Ingrese la conclusión: ")
+
+        # Crear una nueva regla con la información proporcionada
+        new_rule = Rule("nueva_regla", [premise_1, premise_2], conclusion)
+
+        # Verificar si la nueva regla es válida y no está en conflicto con otras reglas existentes
+        is_valid, conflicting_rule = self.expert_system.validate_rule(new_rule)
+
+        if is_valid:
+            # Agregar la nueva regla al sistema experto
+            self.expert_system.add_rule(new_rule)
+            print("La nueva regla se agregó correctamente al sistema experto")
+        else:
+            # Proporcionar información sobre la regla en conflicto
+            print(f"La nueva regla entra en conflicto con la regla existente '{conflicting_rule.get_name()}'")
+
+            # Preguntar al usuario si desea reemplazar la regla existente con la nueva regla
+            replace_rule = input("¿Desea reemplazar la regla existente? (s/n)")
+
+            if replace_rule == "s":
+                # Reemplazar la regla existente con la nueva regla
+                self.expert_system.replace_rule(new_rule, conflicting_rule)
+                print("La regla existente se reemplazó correctamente con la nueva regla")
+            else:
+                # Descartar la nueva regla
+                print("La nueva regla se descartó")
+
+        # Actualizar la base de conocimientos del sistema experto
+        self.expert_system.update_kb()

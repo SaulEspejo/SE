@@ -1,13 +1,54 @@
-def interfaz_usuario():
-  condiciones = []
-  temperatura = input("¿Cuál es la temperatura actual? ")
-  condiciones.append("hace más de 30 grados" if int(temperatura) > 30 else "no hace más de 30 grados")
-  tiempo = input("¿Cómo está el clima? ")
-  condiciones.append("hace sol" if tiempo == "soleado" else "hace mal tiempo")
+import tkinter as tk
+from expert_system import ExpertSystem
 
-  decision = inferir(knowledge_base, condiciones)
+class ExpertSystemGUI(tk.Tk):
+    def __init__(self, expert_system):
+        super().__init__()
+        self.expert_system = expert_system
+        self.title("Sistema Experto")
+        self.geometry("400x400")
 
-  if decision:
-    print("Decisión: " + decision)
-  else:
-    print("No se pudo tomar una decisión.")
+        # Crear elementos de la interfaz
+        self.question_label = tk.Label(self, text="Pregunta")
+        self.question_label.pack()
+
+        self.answer_label = tk.Label(self, text="Respuesta")
+        self.answer_label.pack()
+
+        self.answer_entry = tk.Entry(self)
+        self.answer_entry.pack()
+
+        self.submit_button = tk.Button(self, text="Enviar", command=self.submit_answer)
+        self.submit_button.pack()
+
+        self.quit_button = tk.Button(self, text="Salir", command=self.quit)
+        self.quit_button.pack()
+
+        # Obtener la primera pregunta del sistema experto
+        self.current_question = self.expert_system.get_first_question()
+        self.question_label.config(text=self.current_question)
+
+    def submit_answer(self):
+        # Obtener la respuesta del usuario
+        answer = self.answer_entry.get()
+
+        # Enviar la respuesta al sistema experto y obtener la siguiente pregunta o resultado
+        result = self.expert_system.process_answer(answer)
+
+        if result["type"] == "question":
+            # Si la respuesta es otra pregunta, actualizar la pregunta actual
+            self.current_question = result["question"]
+            self.question_label.config(text=self.current_question)
+            self.answer_entry.delete(0, tk.END)
+        elif result["type"] == "result":
+            # Si la respuesta es un resultado, mostrar el resultado en la etiqueta de respuesta
+            self.answer_label.config(text=result["result"])
+
+if __name__ == "__main__":
+    # Crear y configurar el sistema experto
+    expert_system = ExpertSystem()
+    expert_system.configure_rules()
+
+    # Crear la interfaz de usuario y ejecutar la aplicación
+    app = ExpertSystemGUI(expert_system)
+    app.mainloop()

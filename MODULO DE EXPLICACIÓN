@@ -1,11 +1,33 @@
-def explicar_decision(decision, conocimiento):
-  for regla in conocimiento:
-    premisa, conclusion = regla.split("entonces")
-    premisa = premisa.strip()
-    conclusion = conclusion.strip()
+class ExplanationModule:
+    def __init__(self, expert_system):
+        self.expert_system = expert_system
 
-    if conclusion == decision:
-      print("Se aplicó la regla: " + regla)
-      print("Porque se cumplieron las siguientes condiciones:")
-      for condicion in premisa.split("y"):
-        print("- " + condicion)
+    def explain_answer(self, answer):
+        # Obtener la regla que se aplicó para la respuesta
+        rule = self.expert_system.get_last_rule_applied()
+
+        if rule is None:
+            return "No se puede proporcionar una explicación para esta respuesta"
+
+        # Obtener las premisas y conclusiones de la regla
+        premises = rule.get_premises()
+        conclusion = rule.get_conclusion()
+
+        # Crear una cadena de explicación para la respuesta
+        explanation = f"Para responder '{answer}', se aplicó la regla: \n\n"
+        explanation += f"Si {premises[0]}"
+        for premise in premises[1:]:
+            explanation += f" y {premise}"
+        explanation += f", entonces {conclusion}\n\n"
+        explanation += "Esta regla fue seleccionada debido a los siguientes hechos y reglas previas:\n"
+
+        # Obtener los hechos y reglas previas que se utilizaron en la aplicación de la regla
+        used_facts = rule.get_used_facts()
+        used_rules = rule.get_used_rules()
+
+        for fact in used_facts:
+            explanation += f"- {fact}\n"
+        for used_rule in used_rules:
+            explanation += f"- La regla '{used_rule.get_name()}' fue aplicada\n"
+
+        return explanation

@@ -1,0 +1,11 @@
+def inferir(knowledge_base, condiciones):
+  for regla in knowledge_base:
+    premisa, conclusion = regla.split("entonces")
+    premisa = premisa.strip()
+    conclusion = conclusion.strip()
+
+    premisas_cumplidas = all([condicion in condiciones for condicion in premisa.split("y")])
+    if premisas_cumplidas:
+      return conclusion
+
+  return None

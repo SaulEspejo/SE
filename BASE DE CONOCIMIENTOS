@@ -1,0 +1,2 @@
+knowledge_base = [  ("si es sábado o domingo y hace sol, entonces vamos a la playa"),  
+("si hace mal tiempo, entonces no vamos a la playa"),  ("si hace más de 30 grados, entonces vamos a la playa"),  ("si no vamos a la playa, entonces vamos al cine"),]

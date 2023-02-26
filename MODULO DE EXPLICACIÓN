@@ -1,0 +1,11 @@
+def explicar_decision(decision, conocimiento):
+  for regla in conocimiento:
+    premisa, conclusion = regla.split("entonces")
+    premisa = premisa.strip()
+    conclusion = conclusion.strip()
+
+    if conclusion == decision:
+      print("Se aplicó la regla: " + regla)
+      print("Porque se cumplieron las siguientes condiciones:")
+      for condicion in premisa.split("y"):
+        print("- " + condicion)

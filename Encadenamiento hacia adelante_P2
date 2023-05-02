@@ -1,0 +1,105 @@
+# Definir base de conocimientos
+base_conocimientos = {
+    "futbol":[
+        "Tiene 11 jugadores",
+        "Se juega con una pelota",
+        "Se juega en dos tiempos de 45 minutos",
+        "Se puede anotar con cualquier parte del cuerpo"
+    ],
+    "tenis":[
+        "Se juega con una pelota",
+        "Se juega en individuales o dobles",
+        "Se puede anotar con un ace",
+        "Se juega en sets",
+        "Se juega con raqueta"
+    ],
+    "basketball":[
+        "Tiene 5 jugadores",
+        "Se juega con una pelota",
+        "Se juega con las manos",
+        "Se juega en cuatro tiempos de 12 minutos",
+        "Se puede anotar desde cualquier parte de la cancha"
+    ],
+    "voleibol":[
+        "Tiene 6 jugadores",
+        "Se juega con una pelota",
+        "Se juega en sets",
+        "Se juega con las manos",
+        "El juego comienza con un saque"
+    ],
+    "beisbol":[
+        "Se juega con una pelota",
+        "Se juega con las manos",
+        "Se juega con una bate",
+        "Se obtienen puntos al completar una carrera",
+        "Tiene 9 jugadores"
+    ],
+    "balonmano":[
+        "Se juega con una pelota",
+        "Se juega con las manos",
+        "Se juega en dos tiempos de 30 minutos",
+        "Tiene 12 jugadores"
+    ],
+    "padel":[
+        "Se juega en sets",
+        "Se juega con una pelota",
+        "Se juega en parejas",
+        "Se juega con raqueta"
+    ]
+
+}
+# Definicion de las preguntas.
+preguntas = [
+    "Tiene 11 jugadores", 
+    "Se juega con una pelota",
+    "Se juega en dos tiempos de 45 minutos",
+    "Se puede anotar con cualquier parte del cuerpo",
+    "Se juega en individuales o dobles",
+    "Se puede anotar con un ace",
+    "Se juega en sets",
+    "Se juega con raqueta",
+    "Tiene 5 jugadores",
+    "Se juega en cuatro tiempos de 12 minutos",
+    "Se puede anotar desde cualquier parte de la cancha",
+    "Tiene 6 jugadores",
+    "El juego comienza con un saque",
+    "Se juega con un bate",
+    "Se obtienen puntos al completar una carrera",
+    "Tiene 9 jugadores",
+    "Se juega en dos tiempos de 30 minutos",
+    "Se juega con las manos",
+    "Tiene 12 jugadores",
+    "Se juega en parejas"
+]
+
+def encadenamiento_hacia_adelante(base_conocimientos, preguntas):
+    hechos = []
+
+    for deporte in base_conocimientos.keys():
+        antecedentes = base_conocimientos[deporte]
+
+        for pregunta in preguntas:
+            if pregunta not in hechos:
+                respuesta = input(pregunta + " ")
+
+                if respuesta.casefold() == "si":
+                    if pregunta in antecedentes:
+                        hechos.append(pregunta)
+                    else:
+                        break
+                elif respuesta.casefold() == "no":
+                    if pregunta not in antecedentes:
+                        hechos.append(pregunta)
+                    else:
+                        break
+
+        if len(hechos) == len(preguntas):
+            return deporte
+    return "No se pudo determinar el deporte."
+
+
+    
+#ejecutar el juego
+deporte = encadenamiento_hacia_adelante(base_conocimientos, preguntas)
+
+print("El deporte es:", deporte)

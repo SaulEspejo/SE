@@ -1,0 +1,126 @@
+
+
+# Definimos las reglas del juego
+personajes = ['scarlett', 'plum', 'mustard', 'green', 'peacock', 'white']
+armas = ['candelabro', 'cuchillo', 'llave inglesa', 'revolver', 'soga', 'tuberia']
+lugares = ['cocina', 'comedor', 'sala de estar', 'estudio', 'biblioteca', 'salon de baile', 'vestibulo', 'salon']
+
+# Definimos el conocimiento inicial del juego
+conocimiento = {
+    'personaje': set(personajes),
+    'arma': set(armas),
+    'lugar': set(lugares)
+}
+
+# Definimos la solución del juego
+solucion = {
+    'personaje': 'scarlett',
+    'arma': 'cuchillo',
+    'lugar': 'cocina'
+}
+
+
+
+# Definimos una función que nos permita hacer una pregunta al usuario y actualizar el conocimiento
+def hacer_pregunta(opciones, categoria, solucion):
+    pregunta = ""
+    if categoria == "personaje":
+        pregunta = "\nQuien es el culpable?\n"
+    elif categoria == "arma":
+        pregunta = "\nQue arma se utilizo?\n"
+    elif categoria == "lugar":
+        pregunta = "\nEn que lugar sucedio el asesinato?\n"
+        
+    while True:
+
+        mensaje = pregunta + "Seleccione una opcion:\n"
+        for i, opcion in enumerate(opciones):
+            mensaje += "{}. {}\n".format(i+1, opcion)
+        mensaje += "0. Salir\n"
+        respuesta = input(mensaje)
+        if respuesta == '0':
+            return None
+        elif respuesta.isdigit() and int(respuesta) in range(1, len(opciones)+1):
+            opcion = opciones[int(respuesta)-1]
+            if opcion == solucion[categoria]:
+                return opcion
+            else:
+                print("Respuesta no valida. Por favor, ingrese una opcion diferente.")
+        else:
+            print("Respuesta no valida. Por favor, ingrese un numero entre 0 y {}.".format(len(opciones)-1))
+
+def eliminar_opciones(conocimiento, categoria, opcion, solucion, ultima_categoria=None):
+    categorias = ['personaje', 'arma', 'lugar']
+    if ultima_categoria is not None:
+        categorias.remove(ultima_categoria)
+    if opcion in solucion.values():
+        conocimiento[categoria] = set([opcion])
+    else:
+        if str(opcion) in conocimiento[categoria]:  # modificamos aquí para convertir la respuesta en una cadena antes de verificar su pertenencia al conjunto
+            conocimiento[categoria].remove(str(opcion))  # también convertimos la opción a cadena antes de eliminarla del conjunto
+    conocimiento[categoria].add(str(opcion))  # agregamos la opción elegida por el usuario al conjunto de opciones válidas
+    if len(conocimiento[categoria]) == 1:
+        solucion[categoria] = list(conocimiento[categoria])[0]
+    elif len(conocimiento[categoria]) == 0:
+        print("No se ha encontrado la solucion.")
+        return False
+    
+    # Comprobamos si la opción seleccionada es válida
+    for c in categorias:
+        if str(opcion) in conocimiento[c]:
+            # La opción es válida, eliminamos opciones de otras categorías recursivamente
+            nueva_opcion = hacer_pregunta(list(conocimiento[c]), c, solucion)
+            if nueva_opcion is None:
+                return False
+            return eliminar_opciones(conocimiento, c, nueva_opcion, solucion, ultima_categoria=categoria)
+        
+    # La opción no es válida, pedimos otra respuesta al usuario
+    print("\nLa respuesta no es valida. Por favor, seleccione otra opcion.\n")
+    nueva_opcion = hacer_pregunta(list(conocimiento[categoria]), categoria, solucion)
+    if nueva_opcion is None:
+        return False
+    return eliminar_opciones(conocimiento, categoria, nueva_opcion, solucion, ultima_categoria=categoria)
+
+# Definimos una función que nos permita eliminar opciones del conocimiento basándonos en una respuesta negativa
+def encontrar_solucion(solucion, conocimiento):
+    categorias = ['personaje', 'arma', 'lugar']
+    indices_categorias = [0, 1, 2]
+    ultima_opcion = None
+    for i in indices_categorias:
+        categoria = categorias[i]
+        opciones_categoria = list(conocimiento[categoria])
+        if ultima_opcion is not None:
+            opciones_categoria.append(ultima_opcion)
+        opcion = hacer_pregunta(opciones_categoria, categoria, solucion)
+
+        if opcion is None:
+            return False
+        ultima_opcion = opcion
+        if opcion == solucion[categoria]:
+            continue
+        conocimiento[categoria].discard(opcion)
+        if len(conocimiento[categoria]) == 0:
+            print("No se ha encontrado la solucion. La respuesta correcta era: {} con {} en {}.".format(solucion['personaje'], solucion['arma'], solucion['lugar']))
+            return False
+        if not eliminar_opciones(conocimiento, i, opcion, solucion, ultima_categoria=categoria):
+            return False
+
+    # Si se llega hasta aquí, significa que se encontró la solución
+    print("Has encontrado la solucion!")
+    print("El culpable es {} con {} en {}.".format(solucion['personaje'], solucion['arma'], solucion['lugar']))
+    return True
+
+
+
+
+
+while True:
+    print("Bienvenido al juego de Clue! En este juego, se te presentara un misterioso caso de asesinato que debes resolver. La victima es el senor Black, y tu objetivo es determinar quien es el asesino, que arma se utilizo y en que habitacion se cometio el crimen.")
+    print("La escena del crimen ha sido examinada y se han encontrado varias pistas. Utiliza tu inteligencia y habilidad para interrogar a los sospechosos y deducir quien es el asesino.")
+
+    encontrar_solucion(solucion, conocimiento)
+    respuesta = input("\nDeseas jugar de nuevo? (s/n): ")
+    if respuesta.lower() != 's':
+        #conocimiento = {'personaje': set(personajes), 'arma': set(armas), 'lugar': set(lugares)}
+        break
+print("Gracias por jugar!")

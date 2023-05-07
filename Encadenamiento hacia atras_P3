@@ -1,5 +1,4 @@
 
-
 # Definimos las reglas del juego
 personajes = ['scarlett', 'plum', 'mustard', 'green', 'peacock', 'white']
 armas = ['candelabro', 'cuchillo', 'llave inglesa', 'revolver', 'soga', 'tuberia']

@@ -4,7 +4,7 @@ base_conocimientos = {
         "Tiene 11 jugadores",
         "Se juega con una pelota",
         "Se juega en dos tiempos de 45 minutos",
-        "Se puede anotar con cualquier parte del cuerpo"
+        "Se juega con los pies"
     ],
     "tenis":[
         "Se juega con una pelota",
@@ -53,7 +53,7 @@ preguntas = [
     "Tiene 11 jugadores", 
     "Se juega con una pelota",
     "Se juega en dos tiempos de 45 minutos",
-    "Se puede anotar con cualquier parte del cuerpo",
+    "Se juega con los pies",
     "Se juega en individuales o dobles",
     "Se puede anotar con un ace",
     "Se juega en sets",
@@ -103,3 +103,6 @@ def encadenamiento_hacia_adelante(base_conocimientos, preguntas):
 deporte = encadenamiento_hacia_adelante(base_conocimientos, preguntas)
 
 print("El deporte es:", deporte)
+
+
+

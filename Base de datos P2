@@ -1,0 +1,113 @@
+import mysql.connector
+
+# Conectar a la base de datos
+conexion = mysql.connector.connect(
+  host="localhost",
+  user="root",
+  password="Toyotamr2.",
+  database="basededatos"
+)
+
+cursor = conexion.cursor()
+
+# Crear la tabla de conocimientos
+cursor.execute('''
+    CREATE TABLE IF NOT EXISTS conocimientos (
+        deporte TEXT NOT NULL,
+        conocimiento TEXT NOT NULL
+    );
+''')
+
+# Crear la tabla de preguntas
+cursor.execute('''
+    CREATE TABLE IF NOT EXISTS preguntas (
+        pregunta TEXT NOT NULL
+    );
+''')
+
+# Insertar los conocimientos en la tabla correspondiente
+base_conocimientos = {
+    "futbol":[
+        "Tiene 11 jugadores",
+        "Se juega con una pelota",
+        "Se juega en dos tiempos de 45 minutos",
+        "Se juega con los pies"
+    ],
+    "tenis":[
+        "Se juega con una pelota",
+        "Se juega en individuales o dobles",
+        "Se puede anotar con un ace",
+        "Se juega en sets",
+        "Se juega con raqueta"
+    ],
+    "basketball":[
+        "Tiene 5 jugadores",
+        "Se juega con una pelota",
+        "Se juega con las manos",
+        "Se juega en cuatro tiempos de 12 minutos",
+        "Se puede anotar desde cualquier parte de la cancha"
+    ],
+    "voleibol":[
+        "Tiene 6 jugadores",
+        "Se juega con una pelota",
+        "Se juega en sets",
+        "Se juega con las manos",
+        "El juego comienza con un saque"
+    ],
+    "beisbol":[
+        "Se juega con una pelota",
+        "Se juega con las manos",
+        "Se juega con una bate",
+        "Se obtienen puntos al completar una carrera",
+        "Tiene 9 jugadores"
+    ],
+    "balonmano":[
+        "Se juega con una pelota",
+        "Se juega con las manos",
+        "Se juega en dos tiempos de 30 minutos",
+        "Tiene 12 jugadores"
+    ],
+    "padel":[
+        "Se juega en sets",
+        "Se juega con una pelota",
+        "Se juega en parejas",
+        "Se juega con raqueta"
+    ]
+}
+
+for deporte, conocimientos in base_conocimientos.items():
+    for conocimiento in conocimientos:
+        cursor.execute('''
+            INSERT INTO conocimientos (deporte, conocimiento) VALUES (%(deporte)s, %(conocimiento)s)
+        ''', {'deporte': deporte, 'conocimiento': conocimiento})
+
+# Insertar las preguntas en la tabla correspondiente
+preguntas = [
+    "Tiene 11 jugadores", 
+    "Se juega con una pelota",
+    "Se juega en dos tiempos de 45 minutos",
+    "Se juega con los pies",
+    "Se juega en individuales o dobles",
+    "Se puede anotar con un ace",
+    "Se juega en sets",
+   "Se juega con raqueta",
+    "Tiene 5 jugadores",
+    "Se juega en cuatro tiempos de 12 minutos",
+    "Se puede anotar desde cualquier parte de la cancha",
+    "Tiene 6 jugadores",
+    "El juego comienza con un saque",
+    "Se juega con un bate",
+    "Se obtienen puntos al completar una carrera",
+    "Tiene 9 jugadores",
+    "Se juega en dos tiempos de 30 minutos",
+    "Se juega con las manos",
+    "Tiene 12 jugadores",
+    "Se juega en parejas"
+]
+
+for pregunta in preguntas:
+    cursor.execute("INSERT INTO preguntas (pregunta) VALUES (%s)", (pregunta,))
+    print(f"Se inserto la pregunta: {pregunta}")
+
+conexion.commit()
+

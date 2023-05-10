@@ -1,0 +1,54 @@
+import mysql.connector
+
+# Conectar a la base de datos
+conn = mysql.connector.connect(
+  host="localhost",
+  user="root",
+  password="Toyotamr2.",
+  database="clue_2"
+)
+
+c = conn.cursor()
+
+# Crear la tabla de personajes
+c.execute('''CREATE TABLE IF NOT EXISTS personajes
+             (nombre TEXT,
+              profesion TEXT)''')
+
+# Insertar algunos datos en la tabla de personajes
+c.execute("INSERT INTO personajes VALUES ('Sr. Verde', 'Abogado')")
+c.execute("INSERT INTO personajes VALUES ('Sra. Blanca', 'Doctora')")
+c.execute("INSERT INTO personajes VALUES ('Sra. Escarlata', 'Actriz')")
+c.execute("INSERT INTO personajes VALUES ('Prof. Ciruela', 'Profesor')")
+c.execute("INSERT INTO personajes VALUES ('Cor. Mostaza', 'Militar')")
+
+
+# Crear la tabla de armas
+c.execute('''CREATE TABLE IF NOT EXISTS armas
+             (
+              nombre TEXT)''')
+
+# Insertar algunos datos en la tabla de armas
+c.execute("INSERT INTO armas VALUES ('Cuerda')")
+c.execute("INSERT INTO armas VALUES ('Candelabro')")
+c.execute("INSERT INTO armas VALUES ('Llave inglesa')")
+c.execute("INSERT INTO armas VALUES ('Tubo')")
+c.execute("INSERT INTO armas VALUES ('Revolver')")
+
+# Crear la tabla de locaciones
+c.execute('''CREATE TABLE IF NOT EXISTS locaciones
+             (
+              nombre TEXT)''')
+
+# Insertar algunos datos en la tabla de locaciones
+c.execute("INSERT INTO locaciones VALUES ('Cocina')")
+c.execute("INSERT INTO locaciones VALUES ('Comedor')")
+c.execute("INSERT INTO locaciones VALUES ('Sala de estar')")
+c.execute("INSERT INTO locaciones VALUES ('Salon de baile')")
+c.execute("INSERT INTO locaciones VALUES ('Estudio')")
+
+# Guardar los cambios
+conn.commit()
+
+# Cerrar la conexión a la base de datos
+conn.close()

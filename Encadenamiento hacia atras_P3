@@ -1,113 +1,115 @@
+import random
+import mysql.connector
+import sqlite3
 
-# Definimos las reglas del juego
-personajes = ['scarlett', 'plum', 'mustard', 'green', 'peacock', 'white']
-armas = ['candelabro', 'cuchillo', 'llave inglesa', 'revolver', 'soga', 'tuberia']
-lugares = ['cocina', 'comedor', 'sala de estar', 'estudio', 'biblioteca', 'salon de baile', 'vestibulo', 'salon']
+# Conectar a la base de datos
+conn = mysql.connector.connect(
+  host="localhost",
+  user="root",
+  password="Toyotamr2.",
+  database="clue_2"
+)
 
-# Definimos el conocimiento inicial del juego
-conocimiento = {
-    'personaje': set(personajes),
-    'arma': set(armas),
-    'lugar': set(lugares)
-}
+c = conn.cursor()
 
-# Definimos la solución del juego
-solucion = {
-    'personaje': 'scarlett',
-    'arma': 'cuchillo',
-    'lugar': 'cocina'
-}
+c.execute("SELECT nombre FROM personajes ORDER BY RAND() LIMIT 1")
+personaje = c.fetchone()[0]
 
+c.execute("SELECT nombre FROM armas ORDER BY RAND() LIMIT 1")
+arma = c.fetchone()[0]
 
+c.execute("SELECT nombre FROM locaciones ORDER BY RAND() LIMIT 1")
+locacion = c.fetchone()[0]
 
-# Definimos una función que nos permita hacer una pregunta al usuario y actualizar el conocimiento
-def hacer_pregunta(opciones, categoria, solucion):
-    pregunta = ""
-    if categoria == "personaje":
-        pregunta = "\nQuien es el culpable?\n"
-    elif categoria == "arma":
-        pregunta = "\nQue arma se utilizo?\n"
-    elif categoria == "lugar":
-        pregunta = "\nEn que lugar sucedio el asesinato?\n"
-        
-    while True:
+# Definir las historias
+historias = [
+    {
+        'titulo': 'La muerte del Sr. Verde',
+        'descripcion': f'El Sr. Verde fue encontrado muerto en la {locacion} con {arma} en la mano. La Sra. Blanca estaba en la sala de estar cuando escucho un grito. El Prof. Ciruela estaba en el estudio leyendo un libro. La Sra. Escarlata estaba en el salon de baile practicando su baile favorito. El Cor. Mostaza estaba en el comedor comiendo un bistec. Quien mato al Sr. Verde?',
+        'personaje': personaje,
+        'arma': arma,
+        'locacion': locacion
+    },
+    {
+        'titulo': 'La muerte de la Sra. Blanca',
+        'descripcion': f'La Sra. Blanca fue encontrada muerta en la {locacion} con {arma} en la mano. El Sr. Verde estaba en el salo de baile bailando con la Sra. Escarlata. El Prof. Ciruela estaba en la cocina preparando una taza de te. La Sra. Escarlata estaba en el comedor comiendo una ensalada. El Cor. Mostaza estaba en la sala de estar viendo la television. Quien mato a la Sra. Blanca?',
+        'personaje': personaje,
+        'arma': arma,
+        'locacion': locacion
+    },
+    {
+        'titulo': 'El robo en la mansion',
+        'descripcion': f'Un grupo de ladrones entro en la mansion y robo {arma} de la habitacion del Sr. Verde. La Sra. Blanca estaba en el estudio trabajando en su computadora. El Prof. Ciruela estaba en el jardin regando las plantas. La Sra. Escarlata estaba en el comedor comiendo un pastel. El Cor. Mostaza estaba en el salon de baile ensayando su proximo espectaculo. Quienes son los ladrones?',
+        'personaje': personaje,
+        'arma': arma,
+        'locacion': locacion
+    },
+    {
+        'titulo': 'El secreto del Prof. Ciruela',
+        'descripcion': f'El Prof. Ciruela tiene un oscuro secreto que ha estado escondiendo por anos. Un dia, mientras estaba en la {locacion}, alguien descubrio su secreto y lo amenazo con revelarlo. La Sra. Blanca estaba en la sala de estar leyendo una revista. El Sr. Verde estaba en el comedor comiendo un pastel. La Sra. Escarlata estaba en el jardin regando las plantas. El Cor. Mostaza estaba en el estudio trabajando en una pintura. Quien descubrio el secreto del Prof. Ciruela?',
+        'personaje': personaje,
+        'arma': arma,
+        'locacion': locacion
+    },
+    { 
+        'titulo': 'El asesinato de la Sra. Escarlata',
+        'descripcion': f'La Sra. Escarlata fue encontrada muerta en la {locacion} con {arma} en la mano. El Sr. Verde estaba en la cocina preparando una cena romantica. La Sra. Blanca estaba en el salon de baile ensayando un baile. El Prof. Ciruela estaba en el estudio leyendo un libro. El Cor. Mostaza estaba en la biblioteca buscando informacion. Quien mato a la Sra. Escarlata?',
+        'personaje': personaje,
+        'arma': arma,
+        'locacion': locacion
+    },
+]
 
-        mensaje = pregunta + "Seleccione una opcion:\n"
-        for i, opcion in enumerate(opciones):
-            mensaje += "{}. {}\n".format(i+1, opcion)
-        mensaje += "0. Salir\n"
-        respuesta = input(mensaje)
-        if respuesta == '0':
-            return None
-        elif respuesta.isdigit() and int(respuesta) in range(1, len(opciones)+1):
-            opcion = opciones[int(respuesta)-1]
-            if opcion == solucion[categoria]:
-                return opcion
-            else:
-                print("Respuesta no valida. Por favor, ingrese una opcion diferente.")
-        else:
-            print("Respuesta no valida. Por favor, ingrese un numero entre 0 y {}.".format(len(opciones)-1))
-
-def eliminar_opciones(conocimiento, categoria, opcion, solucion, ultima_categoria=None):
-    categorias = ['personaje', 'arma', 'lugar']
-    if ultima_categoria is not None:
-        categorias.remove(ultima_categoria)
-    if opcion in solucion.values():
-        conocimiento[categoria] = set([opcion])
-    else:
-        if str(opcion) in conocimiento[categoria]:  # modificamos aquí para convertir la respuesta en una cadena antes de verificar su pertenencia al conjunto
-            conocimiento[categoria].remove(str(opcion))  # también convertimos la opción a cadena antes de eliminarla del conjunto
-    conocimiento[categoria].add(str(opcion))  # agregamos la opción elegida por el usuario al conjunto de opciones válidas
-    if len(conocimiento[categoria]) == 1:
-        solucion[categoria] = list(conocimiento[categoria])[0]
-    elif len(conocimiento[categoria]) == 0:
-        print("No se ha encontrado la solucion.")
-        return False
+def generar_historia():
     
-    # Comprobamos si la opción seleccionada es válida
-    for c in categorias:
-        if str(opcion) in conocimiento[c]:
-            # La opción es válida, eliminamos opciones de otras categorías recursivamente
-            nueva_opcion = hacer_pregunta(list(conocimiento[c]), c, solucion)
-            if nueva_opcion is None:
-                return False
-            return eliminar_opciones(conocimiento, c, nueva_opcion, solucion, ultima_categoria=categoria)
-        
-    # La opción no es válida, pedimos otra respuesta al usuario
-    print("\nLa respuesta no es valida. Por favor, seleccione otra opcion.\n")
-    nueva_opcion = hacer_pregunta(list(conocimiento[categoria]), categoria, solucion)
-    if nueva_opcion is None:
-        return False
-    return eliminar_opciones(conocimiento, categoria, nueva_opcion, solucion, ultima_categoria=categoria)
+    # Selección aleatoria de una de las cinco historias
+    historia = random.choice(historias)
+    
+    # Retorno de la historia generada con los valores aleatorios
+    return {
+        'titulo': historia['titulo'],
+        'descripcion': historia['descripcion'].format(
+            personaje=personaje,
+            arma=arma,
+            locacion=locacion
+        ),
+        'personaje': personaje,
+        'arma': arma,
+        'locacion': locacion
+    }
 
-# Definimos una función que nos permita eliminar opciones del conocimiento basándonos en una respuesta negativa
-def encontrar_solucion(solucion, conocimiento):
-    categorias = ['personaje', 'arma', 'lugar']
-    indices_categorias = [0, 1, 2]
-    ultima_opcion = None
-    for i in indices_categorias:
-        categoria = categorias[i]
-        opciones_categoria = list(conocimiento[categoria])
-        if ultima_opcion is not None:
-            opciones_categoria.append(ultima_opcion)
-        opcion = hacer_pregunta(opciones_categoria, categoria, solucion)
+# Función principal para interactuar con el usuario
+def jugar_clue():
+    print('Bienvenido a Clue!\n')
+    
+    # Generación aleatoria de la historia a resolver
+    historia = generar_historia()
+    
+    print('Resuelve el siguiente caso:\n')
+    print(historia['descripcion'])
+    
+    # Elección del jugador de personaje, arma y locación
+    personaje_elegido = input('\nQuien crees que es el culpable?\n ')
+    arma_elegida = input('\nCon que arma crees que se cometio el crimen?\n ')
+    locacion_elegida = input('\nEn que lugar crees que sucedio el crimen? \n')
+    
+    # Comprobación de si la elección del jugador coincide con la solución
+    if personaje_elegido.lower() == historia['personaje'].lower() and arma_elegida.lower() == historia['arma'].lower() and locacion_elegida.lower() == historia['locacion'].lower():
+        print('\nFelicitaciones, has resuelto el caso y atrapado al culpable!')
+    else:
+        print('\nLo siento, tu eleccion no coincide con la solucion.')
+        print(f'\nLa solucion era: {historia["personaje"]} con {historia["arma"]} en la {historia["locacion"]}')
+    
+    # Cierre de la conexión a la base de datos
+    conn.close()
 
-        if opcion is None:
-            return False
-        ultima_opcion = opcion
-        if opcion == solucion[categoria]:
-            continue
-        conocimiento[categoria].discard(opcion)
-        if len(conocimiento[categoria]) == 0:
-            print("No se ha encontrado la solucion. La respuesta correcta era: {} con {} en {}.".format(solucion['personaje'], solucion['arma'], solucion['lugar']))
-            return False
-        if not eliminar_opciones(conocimiento, i, opcion, solucion, ultima_categoria=categoria):
-            return False
+# Ejecución de la función principal
 
-    # Si se llega hasta aquí, significa que se encontró la solución
-    print("Has encontrado la solucion!")
-    print("El culpable es {} con {} en {}.".format(solucion['personaje'], solucion['arma'], solucion['lugar']))
-    return True
+jugar_clue()
+
+
+
+
 
 
 

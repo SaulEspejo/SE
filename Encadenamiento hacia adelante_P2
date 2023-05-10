@@ -1,108 +1,101 @@
-# Definir base de conocimientos
-base_conocimientos = {
-    "futbol":[
-        "Tiene 11 jugadores",
-        "Se juega con una pelota",
-        "Se juega en dos tiempos de 45 minutos",
-        "Se juega con los pies"
-    ],
-    "tenis":[
-        "Se juega con una pelota",
-        "Se juega en individuales o dobles",
-        "Se puede anotar con un ace",
-        "Se juega en sets",
-        "Se juega con raqueta"
-    ],
-    "basketball":[
-        "Tiene 5 jugadores",
-        "Se juega con una pelota",
-        "Se juega con las manos",
-        "Se juega en cuatro tiempos de 12 minutos",
-        "Se puede anotar desde cualquier parte de la cancha"
-    ],
-    "voleibol":[
-        "Tiene 6 jugadores",
-        "Se juega con una pelota",
-        "Se juega en sets",
-        "Se juega con las manos",
-        "El juego comienza con un saque"
-    ],
-    "beisbol":[
-        "Se juega con una pelota",
-        "Se juega con las manos",
-        "Se juega con una bate",
-        "Se obtienen puntos al completar una carrera",
-        "Tiene 9 jugadores"
-    ],
-    "balonmano":[
-        "Se juega con una pelota",
-        "Se juega con las manos",
-        "Se juega en dos tiempos de 30 minutos",
-        "Tiene 12 jugadores"
-    ],
-    "padel":[
-        "Se juega en sets",
-        "Se juega con una pelota",
-        "Se juega en parejas",
-        "Se juega con raqueta"
-    ]
+import mysql.connector
+import random
 
-}
-# Definicion de las preguntas.
-preguntas = [
-    "Tiene 11 jugadores", 
-    "Se juega con una pelota",
-    "Se juega en dos tiempos de 45 minutos",
-    "Se juega con los pies",
-    "Se juega en individuales o dobles",
-    "Se puede anotar con un ace",
-    "Se juega en sets",
-    "Se juega con raqueta",
-    "Tiene 5 jugadores",
-    "Se juega en cuatro tiempos de 12 minutos",
-    "Se puede anotar desde cualquier parte de la cancha",
-    "Tiene 6 jugadores",
-    "El juego comienza con un saque",
-    "Se juega con un bate",
-    "Se obtienen puntos al completar una carrera",
-    "Tiene 9 jugadores",
-    "Se juega en dos tiempos de 30 minutos",
-    "Se juega con las manos",
-    "Tiene 12 jugadores",
-    "Se juega en parejas"
-]
+# Conectar a la base de datos
+conexion = mysql.connector.connect(
+  host="localhost",
+  user="root",
+  password="Toyotamr2.",
+  database="basededatos"
+)
 
-def encadenamiento_hacia_adelante(base_conocimientos, preguntas):
-    hechos = []
+cursor = conexion.cursor()
 
-    for deporte in base_conocimientos.keys():
-        antecedentes = base_conocimientos[deporte]
+# Verificar que hay preguntas y conocimientos en las tablas correspondientes
+cursor.execute('SELECT COUNT(*) FROM preguntas')
+num_preguntas = cursor.fetchone()[0]
+if num_preguntas == 0:
+    print("No hay preguntas en la tabla 'preguntas'.")
+    exit()
 
-        for pregunta in preguntas:
-            if pregunta not in hechos:
-                respuesta = input(pregunta + " ")
+cursor.execute('SELECT COUNT(*) FROM conocimientos')
+num_conocimientos = cursor.fetchone()[0]
+if num_conocimientos == 0:
+    print("No hay conocimientos en la tabla 'conocimientos'.")
+    exit()
 
-                if respuesta.casefold() == "si":
-                    if pregunta in antecedentes:
-                        hechos.append(pregunta)
-                    else:
-                        break
-                elif respuesta.casefold() == "no":
-                    if pregunta not in antecedentes:
-                        hechos.append(pregunta)
-                    else:
-                        break
+# Obtener las preguntas de la tabla correspondiente
+cursor.execute('SELECT pregunta FROM preguntas')
+preguntas = [pregunta[0] for pregunta in cursor.fetchall()]
 
-        if len(hechos) == len(preguntas):
-            return deporte
-    return "No se pudo determinar el deporte."
+# Obtener los conocimientos de la tabla correspondiente
+cursor.execute('SELECT deporte, conocimiento FROM conocimientos')
+base_conocimientos = {}
+for deporte, conocimiento in cursor.fetchall():
+    if deporte not in base_conocimientos:
+        base_conocimientos[deporte] = []
+    base_conocimientos[deporte].append(conocimiento)
 
 
-    
-#ejecutar el juego
-deporte = encadenamiento_hacia_adelante(base_conocimientos, preguntas)
 
-print("El deporte es:", deporte)
+# Obtener las preguntas de la tabla correspondiente
+cursor.execute('SELECT pregunta FROM preguntas')
+preguntas = [pregunta[0] for pregunta in cursor.fetchall()]
+
+# Obtener los conocimientos de la tabla correspondiente
+cursor.execute('SELECT deporte, conocimiento FROM conocimientos')
+base_conocimientos = {}
+for deporte, conocimiento in cursor.fetchall():
+    if deporte not in base_conocimientos:
+        base_conocimientos[deporte] = []
+    base_conocimientos[deporte].append(conocimiento)
+
+# Mostrar opciones de deportes disponibles
+print("Deportes disponibles:")
+for i, deporte in enumerate(base_conocimientos.keys()):
+    print(f"{i+1}. {deporte}")
+
+# Leer opción elegida por el usuario
+opcion = input("Elije el deporte que deseas adivinar (ingresa el numero correspondiente): \n")
+while not opcion.isdigit() or int(opcion) < 1 or int(opcion) > len(base_conocimientos):
+    opcion = input("Opcion invalida. Elije el deporte que deseas adivinar (ingresa el numero correspondiente):\n ")
+# Obtener el deporte correspondiente a la opción elegida
+deportes_disponibles = list(base_conocimientos.keys())
+deporte_elegido = deportes_disponibles[int(opcion)-1]
+
+# Realizar las preguntas al usuario
+respuestas = {}
+for pregunta in preguntas:
+    respuesta = input(f"\n{pregunta}: ")
+    respuestas[pregunta] = respuesta.lower()
+
+
+
+# Comprobar si las respuestas son correctas
+encontrado = False
+for deporte, conocimientos in base_conocimientos.items():
+    es_el_deporte = True
+    for conocimiento in conocimientos:
+        if ":" not in conocimiento:
+            continue
+        pregunta, respuesta_correcta = conocimiento.split(":")
+        respuesta_usuario = respuestas.get(pregunta.lower(), "").strip()
+        if respuesta_usuario != respuesta_correcta.lower():
+            es_el_deporte = False
+            break
+    if es_el_deporte:
+        encontrado = True
+        if deporte == deporte_elegido:
+            print(f"\nFelicidades, has adivinado el deporte!\nDEPORTE: {deporte}\n")
+        else:
+            print(f"Lo siento, no adivinaste")
+        break
+
+    if encontrado:
+        break
+
+if not encontrado:
+    print("Lo siento, tus respuestas no indican ningun deporte de la base de conocimientos.")
 
 
 

@@ -1,0 +1,29 @@
+import mysql.connector
+
+# Conectar a la base de datos
+conn = mysql.connector.connect(
+  host="localhost",
+  user="root",
+  password="Toyotamr2.",
+  database="sintomas"
+)
+
+def obtener_posibles_causas(sintoma):
+    cursor = conn.cursor()
+    consulta = "SELECT causa FROM conocimiento WHERE sintoma = %s"
+    cursor.execute(consulta, (sintoma,))
+    resultados = cursor.fetchall()
+    cursor.close()
+    return resultados
+
+while True:
+    sintoma = input("Ingrese el sintoma del automovil (o 'salir' para terminar): ")
+    if sintoma.lower() == "salir":
+        break
+    posibles_causas = obtener_posibles_causas(sintoma)
+    if posibles_causas:
+        print("\nPosibles causas:")
+        for causa in posibles_causas:
+            print("- " + causa[0] + "\n")
+    else:
+        print("No se encontraron posibles causas para el sintoma ingresado.\n")

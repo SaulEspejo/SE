@@ -1,0 +1,54 @@
+import mysql.connector
+
+# Conectar a la base de datos
+conn = mysql.connector.connect(
+  host="localhost",
+  user="root",
+  password="Toyotamr2.",
+  database="sintomas"
+)
+
+cursor = conn.cursor()
+cursor.execute('''CREATE TABLE conocimiento
+                  (sintoma VARCHAR(255), causa VARCHAR(255))''')
+
+sintoma = "El motor no arranca"
+causa = "Bateria descargada"
+cursor.execute("INSERT INTO conocimiento (sintoma, causa) VALUES (%s, %s)", (sintoma, causa))
+
+sintoma = "El motor no arranca"
+causa = "Problema con el motor de arranque"
+cursor.execute("INSERT INTO conocimiento (sintoma, causa) VALUES (%s, %s)", (sintoma, causa))
+
+sintoma = "El motor no arranca"
+causa = "Fallo en el sistema de encendido"
+cursor.execute("INSERT INTO conocimiento (sintoma, causa) VALUES (%s, %s)", (sintoma, causa))
+
+sintoma = "El motor se sobrecalienta"
+causa = "Nivel bajo de liquido refrigerante"
+cursor.execute("INSERT INTO conocimiento (sintoma, causa) VALUES (%s, %s)", (sintoma, causa))
+
+sintoma = "El motor se sobrecalienta"
+causa = "Problema en el termostato"
+cursor.execute("INSERT INTO conocimiento (sintoma, causa) VALUES (%s, %s)", (sintoma, causa))
+
+sintoma = "El motor se sobrecalienta"
+causa = "Radiador obstruido"
+cursor.execute("INSERT INTO conocimiento (sintoma, causa) VALUES (%s, %s)", (sintoma, causa))
+
+sintoma = "La direccion es dificil de girar"
+causa = "Nivel bajo de liquido de direccion asistida"
+cursor.execute("INSERT INTO conocimiento (sintoma, causa) VALUES (%s, %s)", (sintoma, causa))
+
+sintoma = "La direccion es dificil de girar"
+causa = "Falla en la bomba de direccion asistida"
+cursor.execute("INSERT INTO conocimiento (sintoma, causa) VALUES (%s, %s)", (sintoma, causa))
+
+sintoma = "La direccion es dificil de girar"
+causa = "Problema en la correa de transmision"
+cursor.execute("INSERT INTO conocimiento (sintoma, causa) VALUES (%s, %s)", (sintoma, causa))
+# Asegúrate de confirmar los cambios en la base de datos
+conn.commit()
+
+# Cerrar la conexión a la base de datos
+conn.close()
